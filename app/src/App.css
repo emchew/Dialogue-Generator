@@ -1,0 +1,47 @@
+.canvas {
+  width: 70vw;
+  height: 75vh;
+  border: 1px solid black;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.node-container {
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.toolbar {
+  padding: 10px 10px;
+}
+
+.popover {
+  position: absolute;
+  
+  width: 100px;
+  height: 100px;
+}
+
+.popover-anchor, .tooltip-anchor {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  top: 5px;
+  left: 45px;
+  width: 120px;
+  background-color: rgb(53, 56, 55);
+  color: white;
+  padding: 5px 5px;
+  border-radius: 5px;
+  font-size: 0.5em;
+  z-index: 1;
+}
+
+.hide {
+  display: none;
+}
