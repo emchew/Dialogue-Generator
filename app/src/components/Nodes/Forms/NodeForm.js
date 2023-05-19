@@ -14,6 +14,7 @@ export default function NodeForm({ submit }) {
   const handleReset = () => {
     setSpeaker('');
     setLine('');
+    setNode('');
   }
 
   return (

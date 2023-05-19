@@ -30,11 +30,17 @@ export default function Node({id, canvasOffset, nodeClass, children}) {
         const prevPosition = {...position}
         prevPosition.x = e.clientX - canvasOffset.x - (width / 2);
         prevPosition.y = e.clientY - canvasOffset.y - (height / 2);
-        setPosition(prevPosition);
+        setPosition(prevPosition); 
     }
 
-    const handleClick = () => {
-        isClicked = !isClicked;
+    const handleClick = (e) => {
+        const tag = e.target.tagName.toLowerCase();
+        // Only drag node if the user is not editing form input
+        if (tag !== "select" && tag !== "input") {
+            isClicked = !isClicked;
+        } else {
+            isClicked = false;
+        }
     };
     
     const handleDrag = (e) => {

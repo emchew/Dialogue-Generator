@@ -3,17 +3,21 @@ import React, { useState, useRef, useEffect } from 'react'
 import IconButton from '@mui/material/IconButton';
 import AddDialogueNode from '@mui/icons-material/Add';
 import AddNode from '@mui/icons-material/MapsUgc';
+import AddNodeOption from '@mui/icons-material/List';
 import NodeForm from './Nodes/Forms/NodeForm';
 import Popover from './Popover';
 import Tooltip from './Tooltip';
 import DialogueNode from './Nodes/DialogueNode';
 import Node from './Nodes/Node';
 import DialogueNodeForm from './Nodes/Forms/DialogueNodeForm';
+import OptionForm from './Nodes/Forms/OptionForm';
+import Option from './Nodes/Option';
 
 const tooltips = {
     NONE: '',
     DIALOGUE: 'dialogue',
     NODE: 'node',
+    NODE_OPTION: 'node_option'
 };
 
 export const nodeType = {
@@ -28,6 +32,7 @@ export default function Canvas() {
     const [togglePopover, setTogglePopover] = useState(true);
     const [toggleDialogueNodeTooltip, setToggleDialogueNodeTooltip] = useState(false);
     const [toggleNodeTooltip, setToggleNodeTooltip] = useState(false);
+    const [toggleNodeOptionTooltip, setToggleNodeOptionTooltip] = useState(false);
     const [canvasOffset, setCanvasOffset] = useState({x: 0, y: 0});
     const [nodes, setNodes] = useState([]);
 
@@ -37,11 +42,14 @@ export default function Canvas() {
     }
     
     const handleSubmitNode = (speaker, line, type) => {
-        console.log(type);
         const newNode = {type, speaker, line};
         updateNodes(newNode);
     }
-    
+    const handleSubmitNodeOption = (value) => {
+        const newNode = {value};
+        updateNodes(newNode);
+    }
+
     const updateNodes = (newNode) => {
         const copy = [...nodes];
         copy.push(newNode);
@@ -90,12 +98,27 @@ export default function Canvas() {
                 </Tooltip>
             </IconButton>
 
+            <IconButton
+                className="tooltip-anchor"
+                onClick={() => handlePopover(tooltips.NODE_OPTION)}
+                onMouseEnter={() => setToggleNodeOptionTooltip(true)}
+                onMouseLeave={() => setToggleNodeOptionTooltip(false)}
+            >
+                <AddNodeOption/>
+                <Tooltip open={toggleNodeOptionTooltip}>
+                    Node Option
+                </Tooltip>
+            </IconButton>
+
             <Popover open={togglePopover}>
                 {selectedTooltip === tooltips.DIALOGUE && (
                     <DialogueNodeForm submit={handleSubmitDialogueNode}/>
                 )}
                 {selectedTooltip === tooltips.NODE && (
                     <NodeForm submit={handleSubmitNode}/>
+                )}
+                {selectedTooltip === tooltips.NODE_OPTION && (
+                    <OptionForm submit={handleSubmitNodeOption}/>
                 )}
             </Popover>
 
@@ -111,8 +134,15 @@ export default function Canvas() {
             currentLine="We needa go now"
         />
         {nodes.map((n, key) => {
-            if (n.type === nodeType.DEFAULT || n.type === nodeType.OPTION) {
-                return createNode(n, key, canvasOffset);
+            switch(n.type) {
+                case nodeType.DIALOGUE:
+                    return createDialogueNode(n, key, canvasOffset);
+                case nodeType.DEFAULT || nodeType.OPTION:
+                    return createNode(n, key, canvasOffset);
+                case nodeType.NODE_OPTION:
+                    return createOption(n, key, canvasOffset);
+                default:
+                    return null;
             }
         })}
         <button className="reset-btn">Reset</button>
@@ -131,7 +161,7 @@ function createDialogueNode (node, key, canvasOffset) {
 function createNode(node, key, canvasOffset) {
     return (
         <Node key={key}
-            id={`node-default-${key}`}
+            id={`node-${key}`}
             type={node.type}
             canvasOffset={ canvasOffset }
             currentSpeaker={node.speaker}
@@ -140,4 +170,13 @@ function createNode(node, key, canvasOffset) {
     )
 }
 
+function createOption(node, key, canvasOffset) {
+    return (
+        <Option key={key}
+            id={`node-option-${key}`}
+            canvasOffset={ canvasOffset }
+            currentValue={node.value}
+        />
+    )
+}
 

@@ -58,7 +58,7 @@
 }
 
 .node:hover {
-  border: 2px solid #f5c75b;
+  border: 2px solid #dec63d;
 }
 
 .default-node {
@@ -77,6 +77,13 @@
   border: 2px solid #a1dd73;
 }
 
+.option {
+  background-color: #ffd97f;
+}
+
+.option:hover {
+  border: 2px solid #f09943;
+}
 
 #create-node-container {
   background-color: lightblue;
