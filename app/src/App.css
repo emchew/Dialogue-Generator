@@ -48,7 +48,7 @@
 .node {
   position: absolute;
   width: 250px;
-  height: 120px;
+  height: fit-content;
   background-color: #fcfa8a;
   border-radius: 5px;
 }
@@ -68,6 +68,15 @@
 .default-node:hover {
   border: 2px solid #aeacac;
 }
+
+.option-node {
+  background-color: #dcf4b2;
+}
+
+.option-node:hover {
+  border: 2px solid #a1dd73;
+}
+
 
 #create-node-container {
   background-color: lightblue;

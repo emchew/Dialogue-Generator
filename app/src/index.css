@@ -15,19 +15,14 @@ main {
   align-items: center;
 }
 
-input, textarea {
+input, textarea, select {
   font: inherit;
   font-size: inherit;
   padding: 5px 5px;
-}
-
-input {
   width: 100%;
 }
-
 textarea {
   resize: none;
-  width: 100%;
 }
 
 h5 {

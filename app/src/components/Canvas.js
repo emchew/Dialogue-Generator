@@ -1,36 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react'
 
 import IconButton from '@mui/material/IconButton';
-import AddNode from '@mui/icons-material/Add';
-import AddDefault from '@mui/icons-material/AddComment';
-import DefaultNodeForm from './Nodes/Forms/DefaultNodeForm';
+import AddDialogueNode from '@mui/icons-material/Add';
+import AddNode from '@mui/icons-material/MapsUgc';
+import NodeForm from './Nodes/Forms/NodeForm';
 import Popover from './Popover';
 import Tooltip from './Tooltip';
 import DialogueNode from './Nodes/DialogueNode';
-import DefaultNode from './Nodes/DefaultNode';
+import Node from './Nodes/Node';
 import DialogueNodeForm from './Nodes/Forms/DialogueNodeForm';
 
 const tooltips = {
     NONE: '',
     DIALOGUE: 'dialogue',
-    DEFAULT: 'default'
+    NODE: 'node',
 };
+
+export const nodeType = {
+    DIALOGUE: 'dialogue',
+    DEFAULT: 'default',
+    OPTION: 'option'
+}
 
 export default function Canvas() {
     const canvasRef = useRef();
     const [selectedTooltip, setSelectedTooltip] = useState(tooltips.NONE);
     const [togglePopover, setTogglePopover] = useState(true);
+    const [toggleDialogueNodeTooltip, setToggleDialogueNodeTooltip] = useState(false);
     const [toggleNodeTooltip, setToggleNodeTooltip] = useState(false);
-    const [toggleDefaultNodeTooltip, setToggleDefaultNodeTooltip] = useState(false);
     const [canvasOffset, setCanvasOffset] = useState({x: 0, y: 0});
     const [nodes, setNodes] = useState([]);
-    const handleSubmitDefaultNode = (speaker, line) => {
-        const newNode = {type: tooltips.DEFAULT, speaker, line};
-        updateNodes(newNode);
-    }
 
     const handleSubmitDialogueNode = (id) => {
         const newNode = {type: tooltips.DIALOGUE, id};
+        updateNodes(newNode);
+    }
+    
+    const handleSubmitNode = (speaker, line, type) => {
+        console.log(type);
+        const newNode = {type, speaker, line};
         updateNodes(newNode);
     }
     
@@ -61,32 +69,33 @@ export default function Canvas() {
             <IconButton
                 className="tooltip-anchor"
                 onClick={() => handlePopover(tooltips.DIALOGUE)}
-                onMouseEnter={() => setToggleNodeTooltip(true)}
-                onMouseLeave={() => setToggleNodeTooltip(false)}
+                onMouseEnter={() => setToggleDialogueNodeTooltip(true)}
+                onMouseLeave={() => setToggleDialogueNodeTooltip(false)}
             >
-                <AddNode/>
-                <Tooltip open={toggleNodeTooltip}>
+                <AddDialogueNode/>
+                <Tooltip open={toggleDialogueNodeTooltip}>
                     Dialogue Node
                 </Tooltip>
             </IconButton>
 
             <IconButton
                 className="tooltip-anchor"
-                onClick={() => handlePopover(tooltips.DEFAULT)}
-                onMouseEnter={() => setToggleDefaultNodeTooltip(true)}
-                onMouseLeave={() => setToggleDefaultNodeTooltip(false)}
+                onClick={() => handlePopover(tooltips.NODE)}
+                onMouseEnter={() => setToggleNodeTooltip(true)}
+                onMouseLeave={() => setToggleNodeTooltip(false)}
             >
-                <AddDefault/>
-                <Tooltip open={toggleDefaultNodeTooltip}>
-                    Default Node
+                <AddNode/>
+                <Tooltip open={toggleNodeTooltip}>
+                    Base Node
                 </Tooltip>
             </IconButton>
+
             <Popover open={togglePopover}>
                 {selectedTooltip === tooltips.DIALOGUE && (
                     <DialogueNodeForm submit={handleSubmitDialogueNode}/>
                 )}
-                {selectedTooltip === tooltips.DEFAULT && (
-                    <DefaultNodeForm submit={handleSubmitDefaultNode}/>
+                {selectedTooltip === tooltips.NODE && (
+                    <NodeForm submit={handleSubmitNode}/>
                 )}
             </Popover>
 
@@ -95,15 +104,15 @@ export default function Canvas() {
             currentId="1"
             canvasOffset={ canvasOffset }
         />
-        <DefaultNode
+        <Node
             id="2"
             canvasOffset={ canvasOffset }
             currentSpeaker="Sam"
             currentLine="We needa go now"
         />
         {nodes.map((n, key) => {
-            if (n.type === 'default') {
-                return createDefaultNode(n, key, canvasOffset);
+            if (n.type === nodeType.DEFAULT || n.type === nodeType.OPTION) {
+                return createNode(n, key, canvasOffset);
             }
         })}
         <button className="reset-btn">Reset</button>
@@ -119,10 +128,11 @@ function createDialogueNode (node, key, canvasOffset) {
     )
 }
 
-function createDefaultNode(node, key, canvasOffset) {
+function createNode(node, key, canvasOffset) {
     return (
-        <DefaultNode key={key}
+        <Node key={key}
             id={`node-default-${key}`}
+            type={node.type}
             canvasOffset={ canvasOffset }
             currentSpeaker={node.speaker}
             currentLine={node.line}
