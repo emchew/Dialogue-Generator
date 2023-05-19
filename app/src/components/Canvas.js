@@ -34,25 +34,25 @@ export default function Canvas() {
     const [toggleNodeTooltip, setToggleNodeTooltip] = useState(false);
     const [toggleNodeOptionTooltip, setToggleNodeOptionTooltip] = useState(false);
     const [canvasOffset, setCanvasOffset] = useState({x: 0, y: 0});
+    const [startNode, setStartNode] = useState(-1);
+    const [endNode, setEndNode] = useState(-1);
     const [nodes, setNodes] = useState([]);
+    const currentPosition = { x: 50, y: 200 };
 
     const handleSubmitDialogueNode = (id) => {
-        const newNode = {type: tooltips.DIALOGUE, id};
-        updateNodes(newNode);
+        updateNodes({type: tooltips.DIALOGUE, id});
     }
-    
     const handleSubmitNode = (speaker, line, type) => {
-        const newNode = {type, speaker, line};
-        updateNodes(newNode);
+        updateNodes({type, speaker, line});
     }
     const handleSubmitNodeOption = (value) => {
-        const newNode = {value};
-        updateNodes(newNode);
+        updateNodes({type: tooltips.NODE_OPTION, value});
     }
 
     const updateNodes = (newNode) => {
-        const copy = [...nodes];
-        copy.push(newNode);
+        newNode = {...newNode, currentPosition};
+        const copy = [...nodes, newNode];
+        console.log(newNode)
         setNodes(copy);
     }
 
@@ -123,7 +123,12 @@ export default function Canvas() {
             </Popover>
 
         </div>
-        <DialogueNode
+        <svg width="100%" height="100%" style={{position: 'absolute', top: 0, left: 0, pointerEvents: 'none'}}>
+            {/* <line onClick={() => console.log("clicked")} x1="400" y1="200" x2="800" y2="250" stroke="black"/>
+            <line x1="200" y1="400" x2="600" y2="400" stroke="black"/> */}
+        </svg>
+        
+        {/* <DialogueNode
             currentId="1"
             canvasOffset={ canvasOffset }
         />
@@ -132,15 +137,19 @@ export default function Canvas() {
             canvasOffset={ canvasOffset }
             currentSpeaker="Sam"
             currentLine="We needa go now"
-        />
+        /> */}
         {nodes.map((n, key) => {
+            const parent = {
+                canvasOffset,
+                callbacks: {}
+            }
             switch(n.type) {
                 case nodeType.DIALOGUE:
-                    return createDialogueNode(n, key, canvasOffset);
+                    return createDialogueNode(n, key, parent);
                 case nodeType.DEFAULT || nodeType.OPTION:
-                    return createNode(n, key, canvasOffset);
+                    return createNode(n, key, parent);
                 case nodeType.NODE_OPTION:
-                    return createOption(n, key, canvasOffset);
+                    return createOption(n, key, parent);
                 default:
                     return null;
             }
@@ -150,32 +159,32 @@ export default function Canvas() {
   )
 }
 
-function createDialogueNode (node, key, canvasOffset) {
+function createDialogueNode (node, key, parent) {
     return (
         <DialogueNode key={key}
-            id="2"
+            index={key}
+            parent={parent}
+            currentNode={node}
         />
     )
 }
 
-function createNode(node, key, canvasOffset) {
+function createNode(node, key, parent) {
     return (
         <Node key={key}
-            id={`node-${key}`}
-            type={node.type}
-            canvasOffset={ canvasOffset }
-            currentSpeaker={node.speaker}
-            currentLine={node.line}
+            index={key}
+            parent={ parent }
+            currentNode={node}
         />
     )
 }
 
-function createOption(node, key, canvasOffset) {
+function createOption(node, key, parent) {
     return (
         <Option key={key}
-            id={`node-option-${key}`}
-            canvasOffset={ canvasOffset }
-            currentValue={node.value}
+            index={key}
+            parent={ parent }
+            currentNode={node}
         />
     )
 }
