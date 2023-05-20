@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import NodeBase from './NodeBase';
+import React from 'react'
+import BaseNode from './BaseNode'
 
-export default function Option({index, currentNode, parent }) {
-    const [node, setNode] = useState(currentNode);
-    const updateNode = ({...updatedValue}) => {
-      const copy = {...node, ...updatedValue};
-      setNode(copy);
-    }
-    return (
-        <NodeBase id={index} currentNode={node} parent={parent} nodeClass="option">
-            <h5>Option Value</h5>
-             <form className="container-vertical" onSubmit={e => e.preventDefault()}>
-                <div className="form-grid">
-                    <label htmlFor={`option-${index}-id-txt`}>Value</label>
-                    <input id={`option-${index}-id-txt`} value={node.value}
-                        onChange={e => updateNode({value: e.target.value})}
-                    />
-                </div>
+export default function Option({ index, currentNode, updateNode }) {
+  const updateParentNode = ({...updatedValue}) => {
+    const copy = {...currentNode, ...updatedValue};
+    updateNode(index, copy);
+  }
+  return (
+    <BaseNode index={index} currentNode={currentNode} updateNode={updateNode} nodeClass="option-node">
+        <h5>Option</h5>
+        <form className="container-vertical" onSubmit={e => e.preventDefault()}>
+          <div className="form-grid">
+              <label htmlFor={`option-${index}-id-txt`}>Value</label>
+              <input id={`option-${index}-id-txt`} value={currentNode.value}
+                  onChange={e => updateParentNode({value: e.target.value})}
+              />
+          </div>
         </form>
-        </NodeBase>
-    )
+
+    </BaseNode>
+  )
 }

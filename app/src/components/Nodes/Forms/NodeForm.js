@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { nodeType } from '../../Canvas';
+import { nodeType } from '../../../App';
 
 export default function NodeForm({ submit }) {
   const [speaker, setSpeaker] = useState('');
@@ -14,7 +14,7 @@ export default function NodeForm({ submit }) {
   const handleReset = () => {
     setSpeaker('');
     setLine('');
-    setNode('');
+    setNode(nodeType.DEFAULT);
   }
 
   return (
