@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { nodeType } from '../../../App';
+import { nodeType } from '../../../utility/node';
 
 export default function NodeForm({ submit }) {
   const [speaker, setSpeaker] = useState('');

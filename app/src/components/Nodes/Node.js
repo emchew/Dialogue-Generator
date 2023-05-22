@@ -1,12 +1,30 @@
 import React from 'react'
-import { nodeType } from '../../App';
+import { nodeType } from '../../utility/node';
+import { getNodeFollowedBy } from '../../utility/node';
 import BaseNode from './BaseNode'
-export default function Node({ index, currentNode, updateNode }) {
+
+export default function Node({ index, currentNode, updateNode, getNode}) {
   const nodeClass = currentNode.type === nodeType.OPTION ? "option-node" : "default-node";
   const heading = currentNode.type === nodeType.OPTION ? "Option" : "Default";
   
   const updateParentNode = ({...updatedValue}) => {
     const copy = {...currentNode, ...updatedValue};
+    // If the node type has changed, update the type of nodes a node can be connected to
+    if (copy.type !== currentNode.type) {
+      copy.followedBy = getNodeFollowedBy(copy.type);
+
+      // Delete links to existing nodes if they are invalid 
+      if (copy.type === nodeType.DEFAULT) {
+        // Can't connect default node to a node options node
+        copy.options = [];
+      } else if (copy.type === nodeType.OPTION && copy.next !== -1) {
+        // Can't connect an option node to another option node
+        const next = getNode(copy.next);
+        if (next.type === nodeType.OPTION) {
+          copy.next = -1;
+        }
+      }
+    }
     updateNode(index, copy);
   }
   return (

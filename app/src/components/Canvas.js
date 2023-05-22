@@ -6,7 +6,7 @@ import AddNode from '@mui/icons-material/MapsUgc';
 import AddNodeOption from '@mui/icons-material/List';
 import ConnectButton from '@mui/icons-material/ControlPoint';
 
-import { nodeType } from '../App';
+import { nodeType, getNodeFollowedBy } from '../utility/node';
 import Popover from './Popover';
 import DialogueNodeForm from './Nodes/Forms/DialogueNodeForm';
 import NodeForm from './Nodes/Forms/NodeForm';
@@ -35,20 +35,48 @@ export default function Canvas() {
     const [startNode, setStartNode] = useState(-1);
     const [endNode, setEndNode] = useState(-1);
 
-    const handleSubmitDialogueNode = (id) => updateNodes({type: tooltips.DIALOGUE, id, nextDialogue: -1});
-    const handleSubmitNode = (speaker, line, type) => updateNodes({type, speaker, line});
-    const handleSubmitNodeOption = (value) => updateNodes({type: tooltips.NODE_OPTION, value});
+    const handleSubmitDialogueNode = (id) => {
+        updateNodes({
+            type: nodeType.DIALOGUE, 
+            id,
+            nextDialogue: -1,
+            followedBy: [nodeType.DIALOGUE, nodeType.DEFAULT, nodeType.OPTION]
+        });
+    }
+
+    const handleSubmitNode = (speaker, line, type) => {
+        const followedBy = getNodeFollowedBy(type);
+        updateNodes({type,
+            speaker,
+            line,
+            options:[],
+            followedBy
+        });
+    }
+    const handleSubmitNodeOption = (value) => {
+        updateNodes({
+            type: nodeType.NODE_OPTION,
+            value,
+            followedBy: [nodeType.DIALOGUE, nodeType.DEFAULT, nodeType.OPTION]
+        });
+    }
+    const updateNodes = (newNode) => {
+        newNode = {
+            ...newNode, 
+            currentPosition, 
+            next: -1, 
+            hasNext: true, 
+            dimensions: {width: 0, height: 0}
+        };
+        const copy = [...nodes, newNode];
+        setNodes(copy);
+    }
 
     const getNode = (index) => {
         if (index >= 0 && index < nodes.length) {
             return nodes[index];
         }
         return null;
-    }
-    const updateNodes = (newNode) => {
-        newNode = {...newNode, currentPosition, next: -1, prev: -1, dimensions: {width: 0, height: 0}};
-        const copy = [...nodes, newNode];
-        setNodes(copy);
     }
     const updateNode = (index, node) => {
         const copy = [...nodes];
@@ -77,14 +105,18 @@ export default function Canvas() {
     const connectNode = (index, node) => {
         const copy = [...nodes];
         if (startNode === -1) {
+            copy[index].hasNext = true;
             setStartNode(index);
-        } else if (startNode !== index && checkNodeConnection(copy[startNode], node)) {
+        } else if (startNode !== index && checkNodeEnd(copy[startNode], copy[index])) {
             if (copy[startNode].type === nodeType.DIALOGUE && copy[index].type === nodeType.DIALOGUE) {
                 copy[startNode].nextDialogue = index;
-                console.log("in dialogue");
+            } else if (copy[startNode].type === nodeType.OPTION && copy[index].type === nodeType.NODE_OPTION) {
+                copy[startNode].options.push(index);
             } else {
                 copy[startNode].next = index;
-                copy[index].prev = startNode;
+            }
+            if (!checkHasNext(copy[startNode])) {
+                copy[startNode].hasNext = false;
             }
             setEndNode(index);
             deselectNodes();
@@ -93,11 +125,24 @@ export default function Canvas() {
         setNodes(copy);
     }
 
-    const checkNodeConnection = (start, end) => {
-        console.log("checkign")
+    const checkNodeEnd = (start, end) => {
+        if (!start.hasNext) return false;
+        console.log(start);
+        console.log(end);
+        console.log("has next");
+        console.log(start.followedBy.includes(end.type));
+        return (start.followedBy.includes(end.type));
+    }
 
-        return true;
-        // if (start.type === end.type)
+    const checkHasNext = (start) => {
+        if (start.type === nodeType.OPTION) {
+            return (start.options.length <= 4 && start.nextNode !== -1);
+        }
+        if (start.type === nodeType.DIALOGUE) {
+            return (start.nextDialogue !== -1 && start.next !== -1);
+        }
+
+        return (start.next !== -1);
     }
 
     const deselectNodes = () => {
@@ -108,7 +153,6 @@ export default function Canvas() {
     const deleteConnection = (curr, next) => {
         const copy = [...nodes];
         copy[curr].next = -1;
-        copy[next].prev = -1;
         setNodes(copy);
     }
 
@@ -178,6 +222,11 @@ export default function Canvas() {
                             {n.nextDialogue != null && n.nextDialogue !== -1 && (
                                 <Line key={`${key}-goto-dialogue`} node={n} next= {getNode(n.nextDialogue)} onClick={() => deleteConnection(key, n.nextDialogue)}/>
                             )}
+                            {n.type === nodeType.OPTION && n.options.length > 0 && (
+                                n.options.map((o, oKey)=> {
+                                    return  <Line key={`${key}-goto-option-${oKey}`} node={n} next={getNode(o)} onClick={() => deleteConnection(key, o)}/>
+                                })
+                            )}
                         </Fragment>
                     )        
                 })}
@@ -201,8 +250,8 @@ export default function Canvas() {
                         scale={1}
                     >
                         <div className="handle wrapper">
-                            <NewNode index={key} currentNode={n} updateNode={updateNode}/>
-                            {(n.next === -1 || n.nextDialogue === -1) && (
+                            <NewNode index={key} currentNode={n} updateNode={updateNode} getNode={getNode}/>
+                            {n.hasNext && (
                                 <IconButton 
                                     style={{
                                         position: 'absolute',

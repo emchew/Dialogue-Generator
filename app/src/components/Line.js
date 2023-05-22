@@ -1,5 +1,5 @@
 import React from 'react'
-import { nodeType } from '../App';
+import { nodeType } from '../utility/node';
 
 export default function Line({node, next, onClick }) {
   const isDialogue = isDialogueToDialogueLine(node, next);
