@@ -5,6 +5,7 @@ import AddDialogueNode from '@mui/icons-material/Add';
 import AddNode from '@mui/icons-material/MapsUgc';
 import AddNodeOption from '@mui/icons-material/List';
 import ConnectButton from '@mui/icons-material/ControlPoint';
+import SaveButton from '@mui/icons-material/Save';
 
 import { nodeType, getNodeFollowedBy } from '../utility/node';
 import Popover from './Popover';
@@ -136,13 +137,13 @@ export default function Canvas() {
 
     const checkHasNext = (start) => {
         if (start.type === nodeType.OPTION) {
-            return (start.options.length <= 4 && start.nextNode !== -1);
+            return (start.options.length < 4 || start.next === -1);
         }
         if (start.type === nodeType.DIALOGUE) {
-            return (start.nextDialogue !== -1 && start.next !== -1);
+            return (start.nextDialogue === -1 || start.next === -1);
         }
 
-        return (start.next !== -1);
+        return (start.next === -1);
     }
 
     const deselectNodes = () => {
@@ -150,9 +151,16 @@ export default function Canvas() {
         setEndNode(-1);
     }
 
-    const deleteConnection = (curr, next) => {
+    const deleteConnection = (curr, next, isOptionNode) => {
         const copy = [...nodes];
-        copy[curr].next = -1;
+        if (copy[curr].type === nodeType.DIALOGUE && copy[next].type === nodeType.DIALOGUE) {
+            copy[curr].nextDialogue = -1;
+        } else if (copy[curr].type === nodeType.OPTION && isOptionNode) {
+            copy[curr].options.splice(next, 1);
+        } else {
+            copy[curr].next = -1;
+        }
+        copy[curr].hasNext = true;
         setNodes(copy);
     }
 
@@ -224,7 +232,7 @@ export default function Canvas() {
                             )}
                             {n.type === nodeType.OPTION && n.options.length > 0 && (
                                 n.options.map((o, oKey)=> {
-                                    return  <Line key={`${key}-goto-option-${oKey}`} node={n} next={getNode(o)} onClick={() => deleteConnection(key, o)}/>
+                                    return  <Line key={`${key}-goto-option-${oKey}`} node={n} next={getNode(o)} onClick={() => deleteConnection(key, oKey, true)}/>
                                 })
                             )}
                         </Fragment>

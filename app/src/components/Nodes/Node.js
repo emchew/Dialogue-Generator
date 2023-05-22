@@ -17,11 +17,13 @@ export default function Node({ index, currentNode, updateNode, getNode}) {
       if (copy.type === nodeType.DEFAULT) {
         // Can't connect default node to a node options node
         copy.options = [];
+        copy.hasNext = true;
       } else if (copy.type === nodeType.OPTION && copy.next !== -1) {
         // Can't connect an option node to another option node
         const next = getNode(copy.next);
         if (next.type === nodeType.OPTION) {
           copy.next = -1;
+          copy.hasNext = true;
         }
       }
     }
