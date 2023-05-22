@@ -7,7 +7,7 @@ export default function Option({ index, currentNode, updateNode }) {
     updateNode(index, copy);
   }
   return (
-    <BaseNode index={index} currentNode={currentNode} updateNode={updateNode} nodeClass="option-node">
+    <BaseNode index={index} currentNode={currentNode} updateNode={updateNode} nodeClass="option">
         <h5>Option</h5>
         <form className="container-vertical" onSubmit={e => e.preventDefault()}>
           <div className="form-grid">
