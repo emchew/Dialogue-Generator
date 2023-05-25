@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 
 export default function DialogueNodeForm({ submit }) {
-  const [speaker, setSpeaker] = useState('');
-  const [line, setLine] = useState('');
+  const [id, setId] = useState('');
   
   const handleSubmit = () => {
-    submit(speaker, line);
+    submit(id);
     handleReset();
   }
 
   const handleReset = () => {
-    setSpeaker('');
-    setLine('');
+    setId('');
   }
 
   return (
@@ -19,7 +17,7 @@ export default function DialogueNodeForm({ submit }) {
         <form className="container-vertical" onSubmit={e => e.preventDefault()}>
             <div className="form-grid">
                 <label htmlFor="form-id-txt">Dialogue ID</label>
-                <input id="form-id-txt" value={speaker} onChange={e => setSpeaker(e.target.value)}/>
+                <input id="form-id-txt" value={id} onChange={e => setId(e.target.value)}/>
             </div>
             
             <button type="submit" onClick={handleSubmit}>Add</button>
