@@ -1,7 +1,7 @@
 import { nodeType } from "./node"
 // import fs from 'fs';
 
-export default function saveAsJson (nodes) {
+export default function saveAsJson (sceneName, nodes) {
     const nodesJSONArray = [];
     for (const node of nodes) {
         switch (node.type) {
@@ -10,9 +10,25 @@ export default function saveAsJson (nodes) {
         }
     }
     // console.log(nodesJSONArray)
-    saveFile(nodesJSONArray, 'data.json')
+    downloadFile(JSON.stringify(nodesJSONArray, null, 4), `${sceneName}.json`, 'text/json')
 }
 
+/** Download file Code from
+ * https://theroadtoenterprise.com/blog/how-to-download-csv-and-json-files-in-react
+ */
+const downloadFile = (data, fileName, fileType) => {
+    const blob = new Blob([data], { type: fileType })
+    const a = document.createElement('a')
+    a.download = fileName
+    a.href = window.URL.createObjectURL(blob)
+    const clickEvt = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    a.dispatchEvent(clickEvt)
+    a.remove()
+}
 
 const saveFile = (data, filename) => {
     // fs.write(filename, JSON.stringify(data), (error) => {

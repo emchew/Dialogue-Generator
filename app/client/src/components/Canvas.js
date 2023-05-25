@@ -18,6 +18,7 @@ import Option from './Nodes/Option';
 import Tooltip from './Tooltip';
 import Line from './Line';
 import saveAsJson from '../utility/saveAsJSON';
+import SaveJSONPopover from './Save/SaveJSONPopover';
 
 const tooltips = {
     NONE: '',
@@ -188,11 +189,7 @@ export default function Canvas() {
             name: tooltips.SAVE,
             icon: <SaveButton/>,
             text: "Save as JSON",
-            click: () => {
-                console.log('do an integrity check before saving')
-                saveAsJson(nodes);
-                alert("Saved as JSON")
-            }
+            click: () => handlePopover(tooltips.SAVE)
         },
     ]
 
@@ -230,6 +227,9 @@ export default function Canvas() {
                     )}
                     {selectedTooltip === tooltips.NODE_OPTION && (
                         <OptionForm submit={handleSubmitNodeOption}/>
+                    )}
+                    {selectedTooltip === tooltips.SAVE && (
+                        <SaveJSONPopover nodes={nodes}/>
                     )}
                 </Popover>
             </div>
