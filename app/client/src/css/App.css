@@ -3,7 +3,14 @@
   height: 85vh;
   border: 1px solid black;
   position: relative;
+  overflow: auto;
   background-color: rgb(246, 246, 246);
+}
+
+#canvas-container {
+  height: 1000px;
+  width: 5000px;
+  position: relative;
 }
 
 .grid, .form-grid {
@@ -44,59 +51,11 @@
   width: fit-content;
 }
 
-.node-container {
-  padding: 10px 10px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
-}
-
-.node {
-  width: 250px;
-  height: fit-content;
-  background-color: #fcfa8a;
-  border-radius: 5px;
-  position: absolute
-}
-
-.node:hover, .default-node:hover {
-  transition: border 0.1s ease-out;
-}
-
-.node:hover {
-  border: 2px solid #dec63d;
-}
-
-.default-node {
-  background-color: #e9e7e7;
-}
-
-.default-node:hover {
-  border: 2px solid #aeacac;
-}
-
-.option-node {
-  background-color: #dcf4b2;
-}
-
-.option-node:hover {
-  border: 2px solid #a1dd73;
-}
-
-.option {
-  background-color: #ffd97f;
-}
-
-.option:hover {
-  border: 2px solid #f09943;
-}
-
-#create-node-container {
-  background-color: lightblue;
-  width: 25vw;
-  max-width: 300px;
-}
-
 .toolbar {
+  top: 0;
+  left: 0;
   padding: 10px 10px;
+  width: fit-content
 }
 
 .reset-btn {
@@ -112,7 +71,7 @@
 }
 
 .popover-anchor, .tooltip-anchor {
-  position: relative;
+  position: sticky;
 }
 
 .tooltip {
@@ -127,6 +86,29 @@
   border-radius: 5px;
   font-size: 0.5em;
   z-index: 1;
+}
+
+.menu {
+  width: 100px;
+  list-style: none;
+  position: absolute;
+  top: -10px;
+  right: -100px;
+  cursor: pointer;
+  font-size: 0.8em;
+  border-radius: 20px;
+}
+
+.menu svg {
+  font-size: 0.8em;
+}
+.menu li {
+  padding: 0px 5px;
+  background-color: white;
+}
+
+.menu li:hover {
+  background-color: rgb(239, 239, 239);
 }
 
 .hide {

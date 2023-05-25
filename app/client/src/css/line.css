@@ -1,8 +1,0 @@
-line {
-    pointer-events: all;
-    stroke-width: 2px;
-}
-
-line:hover {
-   stroke: gold;
-}
