@@ -17,12 +17,14 @@ import Node from './Nodes/Node';
 import Option from './Nodes/Option';
 import Tooltip from './Tooltip';
 import Line from './Line';
+import saveAsJson from '../utility/saveAsJSON';
 
 const tooltips = {
     NONE: '',
     DIALOGUE: 'dialogue',
     NODE: 'node',
-    NODE_OPTION: 'node_option'
+    NODE_OPTION: 'node_option',
+    SAVE: 'save'
 };
 
 export default function Canvas() {
@@ -30,6 +32,10 @@ export default function Canvas() {
     const [nodes, setNodes] = useState([]);
     const [togglePopover, setTogglePopover] = useState(true);
     const [selectedTooltip, setSelectedTooltip] = useState(tooltips.NONE);
+    const [toggleTooltips, setToggleTooltips] = useState(() => {
+        return (new Array(Object.keys(tooltips).length - 1))
+            .fill(false, 0)
+    });
     const [toggleDialogueNodeTooltip, setToggleDialogueNodeTooltip] = useState(false);
     const [toggleNodeTooltip, setToggleNodeTooltip] = useState(false);
     const [toggleNodeOptionTooltip, setToggleNodeOptionTooltip] = useState(false);
@@ -47,7 +53,8 @@ export default function Canvas() {
 
     const handleSubmitNode = (speaker, line, type) => {
         const followedBy = getNodeFollowedBy(type);
-        updateNodes({type,
+        updateNodes({
+            type,
             speaker,
             line,
             options:[],
@@ -128,10 +135,6 @@ export default function Canvas() {
 
     const checkNodeEnd = (start, end) => {
         if (!start.hasNext) return false;
-        console.log(start);
-        console.log(end);
-        console.log("has next");
-        console.log(start.followedBy.includes(end.type));
         return (start.followedBy.includes(end.type));
     }
 
@@ -167,28 +170,38 @@ export default function Canvas() {
     const allToolTips = [
         {
             name: tooltips.DIALOGUE,
-            mouseEnter: () => setToggleDialogueNodeTooltip(true),
-            mouseLeave: () => setToggleDialogueNodeTooltip(false),
             icon: <AddDialogueNode/>,
-            open: toggleDialogueNodeTooltip,
-            text: "Dialogue node"
+            text: "Dialogue node",
+            click: () => handlePopover(tooltips.DIALOGUE)
         }, {
             name: tooltips.NODE,
-            mouseEnter: () => setToggleNodeTooltip(true),
-            mouseLeave: () => setToggleNodeTooltip(false),
             icon: <AddNode/>,
-            open: toggleNodeTooltip,
-            text: "Base Node"
+            text: "Base Node",
+            click: () => handlePopover(tooltips.NODE)
         }, {
             name: tooltips.NODE_OPTION,
-            mouseEnter: () => setToggleNodeOptionTooltip(true),
-            mouseLeave: () => setToggleNodeOptionTooltip(false),
             icon: <AddNodeOption/>,
-            open: toggleNodeOptionTooltip,
-            text: "Node Option"
-        }
+            text: "Node Option",
+            click: () => handlePopover(tooltips.NODE_OPTION)
+        },
+        {
+            name: tooltips.SAVE,
+            icon: <SaveButton/>,
+            text: "Save as JSON",
+            click: () => {
+                console.log('do an integrity check before saving')
+                saveAsJson(nodes);
+                alert("Saved as JSON")
+            }
+        },
     ]
 
+    const toggleTooltip = (index, value) => {
+        const tips = [];
+        tips[index] = value;
+        setToggleTooltips(tips);
+    
+    }
 
     return (
         <div id="canvas">
@@ -197,12 +210,12 @@ export default function Canvas() {
                     return (
                         <IconButton key={key}
                             className="tooltip-anchor"
-                            onClick={() => handlePopover(t.name)}
-                            onMouseEnter={t.mouseEnter}
-                            onMouseLeave={t.mouseLeave}
+                            onClick={t.click}
+                            onMouseEnter={() => toggleTooltip(key, true)}
+                            onMouseLeave={() => toggleTooltip(key, false)}
                         >
                             {t.icon}
-                            <Tooltip open={t.open}>
+                            <Tooltip open={toggleTooltips[key]}>
                                 {t.text}
                             </Tooltip>
                         </IconButton>
