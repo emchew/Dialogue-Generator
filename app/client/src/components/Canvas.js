@@ -15,13 +15,16 @@ import Tooltip from './Tooltip';
 import Line from './Line';
 import SaveJSONPopover from './Save/SaveJSONPopover';
 import NodeWrapper from './Nodes/NodeWrapper';
+import LoadIcon from '@mui/icons-material/FileUpload';
+import LoadJSONPopover from './Save/LoadJSONForm';
 
 const tooltips = {
     NONE: '',
     DIALOGUE: 'dialogue',
     NODE: 'node',
     NODE_OPTION: 'node_option',
-    SAVE: 'save'
+    SAVE: 'save',
+    LOAD: 'load'
 };
 
 export default function Canvas() {
@@ -44,7 +47,6 @@ export default function Canvas() {
             followedBy: [nodeType.DIALOGUE, nodeType.DEFAULT, nodeType.OPTION]
         });
     }
-
     const handleSubmitNode = (speaker, line, type) => {
         const followedBy = getNodeFollowedBy(type);
         updateNodes({
@@ -62,6 +64,10 @@ export default function Canvas() {
             followedBy: [nodeType.DIALOGUE, nodeType.DEFAULT, nodeType.OPTION]
         });
     }
+    const handleLoad = (nodes) => {
+        setNodes(nodes);
+    }
+
     const updateNodes = (newNode) => {
         const currentPosition = {x: 200, y: 100}
         newNode = {
@@ -228,8 +234,14 @@ export default function Canvas() {
         {
             name: tooltips.SAVE,
             icon: <SaveButton/>,
-            text: "Save as JSON",
+            text: "Save",
             click: () => handlePopover(tooltips.SAVE)
+        },
+        {
+            name: tooltips.LOAD,
+            icon: <LoadIcon/>,
+            text: "Load file",
+            click: () => handlePopover(tooltips.LOAD)
         },
     ]
 
@@ -237,7 +249,6 @@ export default function Canvas() {
         const tips = [];
         tips[index] = value;
         setToggleTooltips(tips);
-    
     }
 
     return (
@@ -271,6 +282,9 @@ export default function Canvas() {
                         )}
                         {selectedTooltip === tooltips.SAVE && (
                             <SaveJSONPopover nodes={nodes}/>
+                        )}
+                        {selectedTooltip === tooltips.LOAD && (
+                            <LoadJSONPopover nodes={nodes} load={handleLoad}/>
                         )}
                     </Popover>
                 </div>
